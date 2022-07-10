@@ -35,6 +35,7 @@ Alex
 Alexander
 Alexandre
 Alexandru
+Alexey
 Alexnader
 Alfonso
 Alison
@@ -217,6 +218,7 @@ Dang
 Dani
 Daniel
 Daniele
+Daniil
 Danny
 Daren
 Darko
@@ -292,6 +294,7 @@ Evans
 Fabrice
 Fabriczy
 Faisal
+Fajnberg
 Falcon
 Falcón
 Faller
@@ -853,10 +856,12 @@ Russell
 Ryan
 Rézeau
 SSRF
+Saad
 Sachan
 Safat
 Sagar
 Sagie
+Salces
 Salih
 Sammarco
 Sander
@@ -1314,6 +1319,7 @@ skaldrom
 skodak
 spvickers
 stabijoh
+stevando
 stigbjarne
 stronk7
 thepurpleblob
