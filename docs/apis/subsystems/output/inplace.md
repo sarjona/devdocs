@@ -74,6 +74,62 @@ This was a very simplified example, in the real life you will probably want to:
 - Use an existing function to update a record (which hopefully also validates input value and triggers events)
 - Add unit tests and behat tests
 
+<details>
+  <summary>View example</summary>
+  <div>
+
+```php title="admin/tool/mytest/classes/local/inplace_edit_text.php"
+
+class inplace_edit_text extends \core\output\inplace_editable {
+
+    /**
+     * Constructor.
+     *
+     * @param object $record
+     * @return void
+     * @throws dml_exception
+     * @throws coding_exception
+     */
+    public function __construct($record) {
+
+        parent::__construct(
+            'tool_mytest',
+            'mytesttext', // Some id to identify the request in your libs callback.
+            $record->id, // Id of the item to be modified.
+            has_capability('capname', \context_system::instance()), // Some capability check.
+            format_string($record->name), // Display value.
+            $record->name // Value.
+            get_string('edithint', 'tool_mytest'),
+            get_string('editlabel', 'tool_mytest'),
+        );
+        $this->set_type_select($answeroptionstemp);
+    }
+
+    /**
+     * Updates the value in database and returns itself, called from inplace_editable callback
+     *
+     * @param int $itemid
+     * @param mixed $newvalue
+     * @return \self
+     */
+    public static function update($itemid, $newvalue) {
+
+        // Clean the new value.
+        $newvalue = clean_param($newvalue, PARAM_INT);
+
+        // {{ Do some mighty things here}}
+
+        $record = $DB->get_record('xxx', ['id' => 'xxx']);
+        // Finally return itself.
+        $tmpl = new self($record);
+        return $tmpl;
+    }
+}
+```
+
+  </div>
+</details>
+
 ## Toggles and dropdowns
 
 You may choose to set the UI for your inplace editable element to be a string value (default), toggle or dropdown.
@@ -127,6 +183,67 @@ $tmpl = new \core\output\inplace_editable(
 $tmpl->set_type_toggle([0, 1]);
 ```
 
+<details>
+  <summary>View example</summary>
+  <div>
+
+```php title="admin/tool/mytest/classes/local/inplace_edit_select.php"
+
+class inplace_edit_select extends \core\output\inplace_editable {
+
+    /**
+     * Constructor.
+     *
+     * @param object $record
+     * @return void
+     * @throws dml_exception
+     * @throws coding_exception
+     */
+    public function __construct($record) {
+
+        // Get the options for inplace_edit select box.
+        // The array needs the form: $options = ['value1' => 'text1', 'value2' => 'text2']
+        $options = \tool_mytest\classes\helper::get_options();
+
+        parent::__construct(
+            'tool_mytest',
+            'mytestselect', // Some id to identify the request in your libs callback.
+            $record->id, // Id of the item to be modified.
+            has_capability('capname', \context_system::instance()), // Some capability check.
+            $options[$optionkey], // Display value.
+            $optionkey,
+            get_string('edithint', 'tool_mytest'),
+            get_string('editlabel', 'tool_mytest'),
+        );
+        $this->set_type_select($options);
+    }
+
+    /**
+     * Updates the value in database and returns itself, called from inplace_editable callback
+     *
+     * @param int $itemid
+     * @param mixed $newvalue
+     * @return \self
+     */
+    public static function update($itemid, $newvalue) {
+
+        // Clean the new value.
+        $newvalue = clean_param($newvalue, PARAM_INT);
+
+        // {{ Do some mighty things here}}
+
+        $record = $DB->get_record('xxx', ['id' => 'xxx']);
+
+        // Finally return itself.
+        $tmpl = new self($record);
+        return $tmpl;
+    }
+}
+```
+
+  </div>
+</details>
+
 ## How does it work
 
 `inplace_editable` consists of
@@ -143,6 +260,49 @@ All four call each other so it's hard to decide where we start explaining this c
 2. **Templatable element** contains such properties as component, `itemtype`, `itemid`, `displayvalue`, `value`, `editlabel` and `edithint`. When used in a **template** It only renders the display value and the edit link (with `title=edithint`). All other properties are rendered as `data-xxx` attributes. Template also ensures that JavaScript module is loaded.
 
 3. **JavaScript module** registers a listener to when the edit link is clicked and then it replaces the display value with the text input box that allows to edit value. When user presses "Enter" the AJAX request is called to the web service and code from the component is executed. If web service throws an exception it is displayed for user as a popup.
+
+<details>
+  <summary>View example rendering with PHP</summary>
+  <div>
+
+```php
+$renderer = $PAGE->get_renderer('core');
+$inplaceedit = new tool_mytest\local\inplace_edit_text($record);
+$params = $inplaceedit->export_for_template($renderer);
+echo $OUTPUT->render_from_template('core/inplace_edit', $params);
+```
+
+  </div>
+</details>
+
+<details>
+  <summary>View example rendering with JavaScript</summary>
+  <div>
+
+```php title="Render inplace_edit with JavaScript"
+$itemid = 153 // Id of the element to be modified inplace.
+$renderer = $PAGE->get_renderer('core');
+$inplaceedit = new tool_mytest\local\inplace_edit_text($record);
+$params = $inplaceedit->export_for_template($renderer);
+```
+
+```js title="The params are transferred via webservice and are then processed by JavaScript"
+Templates.renderForPromise('core/inplace_edit', params)
+    .then(({html, js}) => {
+        Templates.replaceNodeContents('nodeid', html, js);
+        return true;
+    })
+    .catch((error) => displayException(error));
+```
+
+  </div>
+</details>
+
+:::note
+
+In the examples above, `core/inplace_edit` can also be used as a partial in another template.
+
+:::
 
 ## Events
 
