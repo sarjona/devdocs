@@ -28,15 +28,13 @@ The `humandate` class constructor accepts the following parameters:
 - **`timestamp`** (int): The Unix timestamp to be rendered.
 - **`near`** (int|null): The number of seconds that indicates a nearby date. Defaults to `DAYSECS`, use `null` for no indication. Near dates will be rendered with a different styling depending on the theme (usually red with a warning icon).
 - **`timeonly`** (bool): Whether to show only the time or the full date and time. Defaults to `false`.
-- **`link`** (url|null): an optional URL to link the date to.
-- **`langtimeformat`** (string|null): an optional lang date and time format to use to format the date. Otherwise the output will use the user's preferences or the system default.
+- **`link`** (url|null): An optional URL to link the date to.
+- **`langtimeformat`** (string|null): An optional lang date and time format to use to format the date. Otherwise the output will use the user's preferences or the system default.
 - **`userelatives`** (bool): Whether to use human common words (tomorrow, yesterday) when possible. Defaults to `true`.
 
 ### Example Usage
 
-This will output "Today" if the timestamp is for the current day.
-
-```php
+```php title='This will output "Today" if the timestamp is for the current day.'
 use core_calendar\output\humandate;
 
 $renderer = $PAGE->get_renderer('core', 'output');
